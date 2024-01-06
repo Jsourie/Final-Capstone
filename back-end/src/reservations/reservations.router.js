@@ -6,6 +6,7 @@
 
 // reservations.router.js
 
+
 const router = require("express").Router();
 const methodNotAllowed = require("../errors/methodNotAllowed");
 const controller = require("./reservations.controller");
@@ -21,4 +22,5 @@ router
 
 
 module.exports = router;
+
 

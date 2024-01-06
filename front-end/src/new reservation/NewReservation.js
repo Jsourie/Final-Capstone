@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { createReservation } from "../utils/api";
 import NewReservationForm from "./NewReservationForm";
+import ReservationErrors from "./ReservationErrors";
 
 function NewReservation() {
   const history = useHistory();
@@ -13,13 +14,13 @@ function NewReservation() {
     reservation_time: "",
     people: "",
   };
-  const [reservation, setReservation] = useState({ ...initialFormState });
-  const [errors, setErrors] = useState([]);
+  const [formData, setFormData] = useState({ ...initialFormState });
+  const [error, setError] = useState(null);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setReservation((prevReservation) => ({
-      ...prevReservation,
+    setFormData((prevFormData) => ({
+      ...prevFormData,
       [name]: value,
     }));
   };
@@ -28,11 +29,9 @@ function NewReservation() {
     event.preventDefault();
 
     const today = new Date();
-    const selectedDateTime = new Date(
-      `${reservation.reservation_date}  ${reservation.reservation_time}`
-    );
-    const openingTime = new Date(`${reservation.reservation_date} 10:30:00`);
-    const closingTime = new Date(`${reservation.reservation_date} 21:30:00`);
+    const selectedDateTime = new Date(`${formData.reservation_date}  ${formData.reservation_time}`);
+    const openingTime = new Date(`${formData.reservation_date} 10:30:00`);
+    const closingTime = new Date(`${formData.reservation_date} 21:30:00`);
     const errorMessages = [];
 
     if (selectedDateTime.getDay() === 2) {
@@ -48,23 +47,29 @@ function NewReservation() {
     }
 
     if (selectedDateTime > closingTime) {
-      errorMessages.push("Reservation time must be before 10:30 PM.");
+      errorMessages.push("Reservation time must be before 9:30 PM.");
     }
 
     if (errorMessages.length > 0) {
-      setErrors(errorMessages);
+      const combinedErrorMessage = errorMessages.join(" ");
+      console.log("Error messages:", combinedErrorMessage);
+
+      setError(new Error(combinedErrorMessage));
       return;
     }
 
-    createReservation(reservation)
-      .then(() => {
-        setReservation({ ...initialFormState });
-        history.push(`/dashboard?date=${reservation.reservation_date}`);
-      })
-      .catch((error) => {
-        console.error("Error creating reservation:", error);
-      });
-  };
+    createReservation(formData)
+    .then(() => {
+      setFormData({ ...initialFormState });
+      const reservationDate = formData.reservation_date;
+      const dashboardRoute = `/dashboard?date=${reservationDate}`;
+      history.push(dashboardRoute);
+    })
+    .catch((error) => {
+      console.error("Error creating reservation:", error);
+      setError(error); 
+    });
+};
 
   const goBack = () => {
     history.goBack();
@@ -72,16 +77,9 @@ function NewReservation() {
 
   return (
     <div>
-      {errors.length > 0 && (
-        <div className="alert alert-danger">
-          <p>ERROR:</p>
-          {errors.map((error, index) => (
-            <p key={index}>{error}</p>
-          ))}
-        </div>
-      )}
-      <NewReservationForm
-        formData={reservation}
+      <ReservationErrors errors={error ? [error] : null} />
+       <NewReservationForm
+        formData={formData}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
         goBack={goBack}
@@ -91,3 +89,6 @@ function NewReservation() {
 }
 
 export default NewReservation;
+
+
+

@@ -1,8 +1,7 @@
+// reservations.controller.js
+
 const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
-
-
-
 
 async function read(req, res) {
   const { reservation_id } = req.params;
@@ -33,15 +32,35 @@ async function filterDate(req, res) {
 
 async function create(req, res) {
   try {
-    const reservationDate = new Date(req.body.data.date);
-    const today = new Date();
-
-    if (reservationDate.getDay() === 2) { // 0 is Sunday, 1 is Monday, ..., 6 is Saturday
-      return res.status(400).json({ error: "Reservations are not allowed on Tuesdays as the restaurant is closed." });
+    // Validate data is present
+    if (!req.body.data) {
+      return res.status(400).json({ error: 'Data is missing.' });
     }
 
-    if (reservationDate < today) {
-      return res.status(400).json({ error: "Past reservations are not allowed. Please choose a future date." });
+    // Validate required fields are not missing or empty
+    const requiredFields = ['first_name', 'last_name', 'mobile_number', 'reservation_date', 'reservation_time', 'people'];
+    const emptyFields = requiredFields.filter(field => !req.body.data[field] || req.body.data[field] === "");
+
+    if (emptyFields.length > 0) {
+      return res.status(400).json({ error: `${emptyFields.join(', ')} ${emptyFields.length > 1 ? 'are' : 'is'} required.` });
+    }
+
+    // Validate reservation_date is a date
+    const dateRegex = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12][0-9]|3[01])$/;
+    if (!dateRegex.test(req.body.data.reservation_date)) {
+      return res.status(400).json({ error: 'Reservation date must be a valid date.' });
+    }
+
+    // Validate reservation_time is a time
+    const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+    if (!req.body.data.reservation_time || req.body.data.reservation_time.match(timeRegex)) {
+      return res.status(400).json({ error: 'Invalid time format for reservation_time.' });
+    }
+
+    // Validate people is a number
+    const parsedPeople = parseInt(req.body.data.people, 10);
+    if (isNaN(parsedPeople) || parsedPeople < 1) {
+      return res.status(400).json({ error: 'Number of people must be a valid number greater than 0.' });
     }
 
     const data = await service.create(req.body.data);
@@ -51,6 +70,8 @@ async function create(req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
+
 
 
 
@@ -73,8 +94,6 @@ async function searchReservation(req, res, next) {
     next(error);
   }
 }
-
-
 
 async function listByDateOrMobileNumber(req, res) {
   try {
@@ -128,16 +147,12 @@ async function updateReservation(req, res, next) {
   }
 }
 
-
-
-
 module.exports = {
-  read:asyncErrorBoundary(read),
+  read: asyncErrorBoundary(read),
   create: asyncErrorBoundary(create),
   filterDate: asyncErrorBoundary(filterDate),
   list: asyncErrorBoundary(list),
-  listByDateOrMobileNumber:asyncErrorBoundary(listByDateOrMobileNumber),
+  listByDateOrMobileNumber: asyncErrorBoundary(listByDateOrMobileNumber),
   updateReservation: asyncErrorBoundary(updateReservation),
-  searchReservation: asyncErrorBoundary(searchReservation)
+  searchReservation: asyncErrorBoundary(searchReservation),
 };
-
