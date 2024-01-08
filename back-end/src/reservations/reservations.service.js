@@ -1,11 +1,10 @@
 const knex = require("../db/connection");
 
 
+
 async function read(reservationId) {
-  return await knex('reservations').select('*').where({ reservation_id: reservationId }).first();
-}
-
-
+    return await knex('reservations').where({ reservation_id: reservationId }).first();
+  }
 
 
 async function listByDate(date) {
@@ -50,6 +49,26 @@ function update(reservationId, updatedReservation) {
     .then((reservations) => reservations[0]);
 }
 
+async function updateStatus(reservationId, status) {
+    try {
+      const updatedRows = await knex('reservations')
+        .where({ reservation_id: reservationId })
+        .update({ status: status });
+  
+      if (updatedRows === 0) {
+        throw new Error('No rows updated. Reservation not found.');
+      }
+  
+      return { success: true };
+    } catch (error) {
+      console.error('Error in updateStatus function:', error);
+      throw error;
+    }
+  }
+
+  async function getReservationById(reservationId) {
+    return await knex('reservations').where({ reservation_id: reservationId }).first();
+  }
 
 
 
@@ -60,7 +79,11 @@ module.exports = {
   search,
   read,
   update,
+  updateStatus,
+  getReservationById,
 };
+
+
 
 
 

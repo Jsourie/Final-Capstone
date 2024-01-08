@@ -18,25 +18,55 @@ async function create(table) {
     .returning("*")
     .then((createdRecords) => createdRecords[0]);
 }
+/////////////////////////////////////////////////////////////////////////////////////
+async function updateTable(tableId, reservationId) {
+  
+  const updatedTable = await knex("tables")
+    .where({ table_id: tableId })
+    .update({ reservation_id: reservationId }, "*")
+    .then((tables) => tables[0]);
 
-function updateTable(tableId, reservationId) {
-    return knex("tables")
-      .where({ table_id: tableId })
-      .update({ reservation_id: reservationId }, "*")
-      .then((tables) => tables[0]);
+  await knex("reservations")
+    .where({ reservation_id: reservationId })
+    .update({ status: "seated" });
+
+  return updatedTable;
+}
+
+
+
+
+async function deleteSeat(tableId, reservationId) {
+  const seatFinished = await knex("tables")
+    .where({ table_id: tableId })
+    .update({ reservation_id: null }, "*")
+    .then((seats) => seats[0]);
+
+    await knex("reservations")
+      .where({ reservation_id: reservationId })
+      .update({ status: "finished" });
+
+  return seatFinished;
+}
+
+
+
+  async function getTableById(tableId) {
+    return await knex('tables').select('*').where({ table_id: tableId }).first();
   }
 
-  function deleteSeat(tableId) {
-    return knex("tables")
-      .where({ table_id: tableId })
-      .update({ reservation_id: null}, "*")
-      .then((seats) => seats[0]);
+
+
+  async function getReservationById(reservationId) {
+    return await knex('reservations').where({ reservation_id: reservationId }).first();
   }
 
 module.exports = {
   list,
   create,
   updateTable,
+  getTableById,
+  getReservationById,
   deleteSeat
 };
 

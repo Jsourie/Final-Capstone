@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { listTables,listReservations, assignTableToReservation } from "../utils/api";
+import { listTables, listReservations, assignTableToReservation } from "../utils/api";
 
 function ReservationSeat() {
   const history = useHistory();
@@ -22,14 +22,6 @@ function ReservationSeat() {
         .catch(setTablesError);
     };
 
-    loadTables();
-
-    return () => abortController.abort();
-  }, []);
-
-  useEffect(() => {
-    const abortController = new AbortController();
-
     const loadReservations = () => {
       setReservationsError(null);
       listReservations(abortController.signal)
@@ -37,6 +29,7 @@ function ReservationSeat() {
         .catch(setReservationsError);
     };
 
+    loadTables();
     loadReservations();
 
     return () => abortController.abort();
@@ -64,6 +57,10 @@ function ReservationSeat() {
     history.goBack();
   };
 
+  const availableTables = tables.filter(
+    (table) => table.capacity >= reservation?.people && table.reservation_id === null
+  );
+
   return (
     <div>
       <h2>Seat Reservation</h2>
@@ -80,18 +77,14 @@ function ReservationSeat() {
             <option value="" disabled>
               Select a table
             </option>
-            {tables
-              .filter((table) => table.capacity >= reservation?.people && table.reservation_id === null)
-              .map((table) => (
-                <option key={table.table_id} value={table.table_id}>
-                  {table.table_name} - {table.capacity}
-                </option>
-              ))}
+            {availableTables.map((table) => (
+              <option key={table.table_id} value={table.table_id}>
+                {table.table_name} - {table.capacity}
+              </option>
+            ))}
           </select>
         </div>
-        {errorMessage && (
-          <div className="alert alert-danger">{errorMessage}</div>
-        )}
+        {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
         <div>
           <button type="submit" className="btn btn-primary">
             Submit

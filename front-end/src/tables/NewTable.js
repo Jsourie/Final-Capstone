@@ -18,11 +18,13 @@ function NewTable() {
   
     const handleInputChange = (event) => {
       const { name, value } = event.target;
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
+    
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: name === "capacity" ? Number(value) : value,
+      }));
     };
+    
   
     const handleSubmit = (event) => {
       event.preventDefault();

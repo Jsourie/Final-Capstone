@@ -12,30 +12,37 @@ function NewReservation() {
     mobile_number: "",
     reservation_date: "",
     reservation_time: "",
-    people: "",
+    people: 1,
   };
   const [formData, setFormData] = useState({ ...initialFormState });
   const [error, setError] = useState(null);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
+  
     setFormData((prevFormData) => ({
       ...prevFormData,
-      [name]: value,
+      [name]: name === "people" ? Number(value) : value,
     }));
   };
-
+  
   const handleSubmit = (event) => {
     event.preventDefault();
 
     const today = new Date();
     const selectedDateTime = new Date(`${formData.reservation_date}  ${formData.reservation_time}`);
     const openingTime = new Date(`${formData.reservation_date} 10:30:00`);
-    const closingTime = new Date(`${formData.reservation_date} 21:30:00`);
+    const closingTime = new Date(`${formData.reservation_date} 22:30:00`);
     const errorMessages = [];
 
     if (selectedDateTime.getDay() === 2) {
-      errorMessages.push("The restaurant is closed on Tuesdays.");
+     errorMessages.push("The restaurant is closed on Tuesdays.");
+     }
+
+    if (selectedDateTime > closingTime) {
+      errorMessages.push("Reservation time must be before 10:30 PM.");
+      console.log(closingTime)
+      console.log(selectedDateTime)
     }
 
     if (selectedDateTime < today) {
@@ -44,11 +51,7 @@ function NewReservation() {
 
     if (selectedDateTime < openingTime) {
       errorMessages.push("Reservation time must be after 10:30 AM.");
-    }
-
-    if (selectedDateTime > closingTime) {
-      errorMessages.push("Reservation time must be before 9:30 PM.");
-    }
+     }
 
     if (errorMessages.length > 0) {
       const combinedErrorMessage = errorMessages.join(" ");
