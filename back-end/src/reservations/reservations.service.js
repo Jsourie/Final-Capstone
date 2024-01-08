@@ -41,30 +41,14 @@ async function create(reservation) {
     .then((createdRecords) => createdRecords[0]);
 }
 
-
-function update(reservationId, updatedReservation) {
+function update(reservationId, updatedFields) {
   return knex("reservations")
     .where({ reservation_id: reservationId })
-    .update(updatedReservation, "*")
+    .update(updatedFields)
     .then((reservations) => reservations[0]);
 }
 
-async function updateStatus(reservationId, status) {
-    try {
-      const updatedRows = await knex('reservations')
-        .where({ reservation_id: reservationId })
-        .update({ status: status });
-  
-      if (updatedRows === 0) {
-        throw new Error('No rows updated. Reservation not found.');
-      }
-  
-      return { success: true };
-    } catch (error) {
-      console.error('Error in updateStatus function:', error);
-      throw error;
-    }
-  }
+
 
   async function getReservationById(reservationId) {
     return await knex('reservations').where({ reservation_id: reservationId }).first();
@@ -79,7 +63,6 @@ module.exports = {
   search,
   read,
   update,
-  updateStatus,
   getReservationById,
 };
 

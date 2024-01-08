@@ -23,6 +23,7 @@ router.route ("/:reservationId")
 router
   .route("/:reservationId/status")
   .get(controller.read)
+  .put(controller.update)
   .all(methodNotAllowed);
 
 

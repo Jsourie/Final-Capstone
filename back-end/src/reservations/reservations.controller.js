@@ -34,7 +34,7 @@ async function filterDate(req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
-
+///////////////////////////////CREATE//////////
 
 async function validateAndCreate(req, res) {
   try {
@@ -120,7 +120,7 @@ async function validateAndCreate(req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
-
+////////////////////////////////////////////////////////////////////
 
 async function list(req, res) {
   try {
@@ -168,69 +168,33 @@ async function listByDateOrMobileNumber(req, res) {
   }
 }
 
-async function updateReservation(req, res, next) {
-  const newStatus = req.body.data.status;
-
-  const validStatuses = ['booked', 'seated', 'finished', 'cancelled'];
-  if (!validStatuses.includes(newStatus)) {
-    return res.status(400).json({ error: 'Invalid status' });
-  }
-
-  const updatedReservation = {
-    ...res.locals.reservations,
-    status: newStatus,
-    reservation_id: res.locals.reservations.reservation_id,
-  };
-
+////////////////
+async function updateStatus(req, res, next) {
   try {
-    const updatedData = await service.update(updatedReservation);
-    const responseData = {
-      ...updatedData,
-    };
-    res.json({ data: responseData });
+    // Check if the reservation is not finished
+    if (res.locals.reservation.status === 'finished') {
+      return res.status(400).json({ error: 'Reservation already finished.' });
+    }
+
+    // Validate the new status
+    const { status } = req.body.data;
+    const VALID_FIELDS = ['booked', 'seated', 'finished'];
+    if (!status || !VALID_FIELDS.includes(status)) {
+      return res.status(400).json({ error: 'Unknown status.' });
+    }
+
+    // Update the status in res.locals and the database
+    res.locals.reservation.status = status;
+    const updatedReservation = await service.update(res.locals.reservation);
+
+    // Respond with the updated data
+    res.json({ data: updatedReservation });
   } catch (error) {
-    console.error("Error updating reservation:", error);
-    next(error);
-  }
-}
-
-
-
-
-async function updateStatus(req, res) {
-  try {
-    if (!req.body.data) {
-      return res.status(400).json({ error: 'Data is missing.' });
-    }
-
-    const { status, reservation_id } = req.body.data;
-
-    if (!reservation_id) {
-      return res.status(400).json({ error: 'Reservation ID is missing.' });
-    }
-
-    const existingReservation = await service.getReservationById(reservation_id);
-
-    if (!existingReservation) {
-      return res.status(404).json({ error: 'Reservation not found.' });
-    }
-
-    if (status === 'finished') {
-      return res.status(400).json({ error: 'Status cannot be set to "finished".' });
-    }
-
-    const VALIDFIELDS = ['booked', 'seated', 'finished'];
-
-    if (!status || !VALIDFIELDS.includes(status)) {
-      return res.status(400).json({ error: 'Invalid status.' });
-    }
-
-    await service.updateStatus(reservation_id, status);
-
-    res.status(200).json({ message: 'Status updated successfully.' });
-  } catch (error) {
-    console.error('Error in reservations controller:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error updating reservation status:', error);
+    next({
+      status: 500,
+      message: 'Internal Server Error',
+    });
   }
 }
 
@@ -242,7 +206,6 @@ module.exports = {
   filterDate: asyncErrorBoundary(filterDate),
   list: asyncErrorBoundary(list),
   listByDateOrMobileNumber: asyncErrorBoundary(listByDateOrMobileNumber),
-  updateReservation: asyncErrorBoundary(updateReservation),
   searchReservation: asyncErrorBoundary(searchReservation),
-  updateStatus: asyncErrorBoundary(updateStatus),
+  update:[asyncErrorBoundary(read),asyncErrorBoundary(updateStatus)],
 };
