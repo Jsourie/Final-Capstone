@@ -176,13 +176,13 @@ export async function deleteSeat(table_id, signal) {
 
 
 export async function updateReservation(reservation_id, newStatus, signal) {
-  const url = `${API_BASE_URL}/reservation/${reservation_id}/status`;
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
   const options = { method: "PUT", signal };
   return await fetchJson(url, options);
 }
 
 
 export async function readReservation(reservation_id, signal) {
-  const url = `${API_BASE_URL}/reservation/${reservation_id}/status`;
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
   const options = { method: "GET", signal };
   return await fetchJson(url, options);}

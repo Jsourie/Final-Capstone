@@ -180,7 +180,7 @@ async function updateStatus(req, res, next) {
 
     // Validate the new status
     const { status } = req.body.data;
-    const VALID_FIELDS = ['booked', 'seated', 'finished'];
+    const VALID_FIELDS = ['booked', 'seated', 'finished','cancelled'];
     if (!status || !VALID_FIELDS.includes(status)) {
       return next({
         status: 400,

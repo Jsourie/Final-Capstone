@@ -53,17 +53,17 @@ function Dashboard({ date }) {
 
   const handleFinish = async (tableId, reservationId) => {
     const confirmed = window.confirm("Is this table ready to seat new guests? This cannot be undone.");
-    
+  
     if (confirmed) {
       try {
         await deleteSeat(tableId);
-        await updateReservation(reservationId, 'finished');
         history.push("/");
       } catch (error) {
         console.error("Error finishing table:", error);
       }
     }
   };
+  
   
 
 
