@@ -161,6 +161,8 @@ async function listByDateOrMobileNumber(req, res) {
       data = await service.list();
     }
 
+    data = data.filter(reservation => reservation.status !== 'finished');
+
     res.json({ data });
   } catch (error) {
     console.error("Error in reservations controller:", error);
@@ -180,17 +182,91 @@ async function updateStatus(req, res, next) {
     const { status } = req.body.data;
     const VALID_FIELDS = ['booked', 'seated', 'finished'];
     if (!status || !VALID_FIELDS.includes(status)) {
-      return res.status(400).json({ error: 'Unknown status.' });
+      return next({
+        status: 400,
+        message: `Invalid status: ${status}`,
+      });
     }
 
-    // Update the status in res.locals and the database
-    res.locals.reservation.status = status;
-    const updatedReservation = await service.update(res.locals.reservation);
+    const { reservation_id } = res.locals.reservation;
+  const updatedReservation = await service.update(reservation_id, status);
 
     // Respond with the updated data
     res.json({ data: updatedReservation });
   } catch (error) {
     console.error('Error updating reservation status:', error);
+    next({
+      status: 500,
+      message: 'Internal Server Error',
+    });
+  }
+}
+
+
+async function reservationExists(req, res, next) {
+  const { reservationId } = req.params
+
+  const reservation = await service.read(reservationId);
+  if (reservation) {
+    res.locals.reservation = reservation
+    return next()
+  }
+  next({
+    status: 404,
+    message: `Reservation'${reservationId}' not found.`
+  })
+}
+
+//////////////////////update reservation///////////
+
+async function updateReservation(req, res, next) {
+  try {
+    // Validate if data is missing
+    if (!req.body.data) {
+      return res.status(400).json({ error: 'Data is missing.' });
+    }
+
+    // Validate required fields are not missing or empty
+    const requiredFields = ['first_name', 'last_name', 'mobile_number', 'reservation_date', 'reservation_time', 'people'];
+    const emptyFields = requiredFields.filter(field => !req.body.data[field] || req.body.data[field] === "");
+
+    if (emptyFields.length > 0) {
+      return res.status(400).json({ error: `${emptyFields.join(', ')} ${emptyFields.length > 1 ? 'are' : 'is'} required.` });
+    }
+
+    // Validate reservation_date is a date
+    const { reservation_date } = req.body.data;
+    const dateFormat = /^\d{4}-\d{1,2}-\d{1,2}$/;
+
+    if (!dateFormat.test(reservation_date)) {
+      return res.status(400).json({ error: `Invalid date format for reservation_date.` });
+    }
+
+    // Validate reservation_time is a time
+    const { reservation_time } = req.body.data;
+    const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
+
+    if (!reservation_time || !reservation_time.match(timeRegex)) {
+      return res.status(400).json({ error: 'Invalid time format for reservation_time.' });
+    }
+
+    // Validate people is a number
+    const { people } = req.body.data;
+
+    if (!Number.isInteger(people) || people <= 0) {
+      return res.status(400).json({ error: "people must be a positive integer." });
+    }
+
+    // Proceed with updating the reservation if all validations pass
+    const { reservation_id } = req.params; 
+    const updatedFields = { ...req.body.data }; 
+
+    const updatedReservation = await service.updateReservation(reservation_id, updatedFields);
+
+    // Respond with the updated data
+    res.json({ data: updatedReservation });
+  } catch (error) {
+    console.error('Error updating reservation:', error);
     next({
       status: 500,
       message: 'Internal Server Error',
@@ -207,5 +283,6 @@ module.exports = {
   list: asyncErrorBoundary(list),
   listByDateOrMobileNumber: asyncErrorBoundary(listByDateOrMobileNumber),
   searchReservation: asyncErrorBoundary(searchReservation),
-  update:[asyncErrorBoundary(read),asyncErrorBoundary(updateStatus)],
+  update:[asyncErrorBoundary(reservationExists),asyncErrorBoundary(updateStatus)],
+  updateReservation:[asyncErrorBoundary(reservationExists),asyncErrorBoundary(updateReservation)],
 };

@@ -78,13 +78,18 @@ async function seatReservation(req, res, next) {
     if (!reservation) {
       return res.status(404).json({ error: `Reservation with ID ${reservation_id} not found.` });
     }
-    
+
+
+   if (reservation.status === 'seated') {
+  return res.status(400).json({ error: "Reservation is already seated." });
+  }
 
     // Check if the table is occupied
     if (table.reservation_id) {
       return res.status(400).json({ error: "Table is occupied." });
     }
 
+  
     // Check if the table has sufficient capacity
     if (table.capacity < reservation.people) {
       return res.status(400).json({ error: "Table does not have sufficient capacity." });

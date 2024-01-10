@@ -2,12 +2,15 @@ const knex = require("../db/connection");
 
 
 
-async function read(reservationId) {
-    return await knex('reservations').where({ reservation_id: reservationId }).first();
-  }
+function read(reservation_id) {
+  return knex("reservations")
+  .select("*")
+  .where({ reservation_id })
+  .first()
+}
 
 
-async function listByDate(date) {
+function listByDate(date) {
  return knex("reservations")
  .select("*")
 .where({ reservation_date: date })
@@ -41,13 +44,18 @@ async function create(reservation) {
     .then((createdRecords) => createdRecords[0]);
 }
 
-function update(reservationId, updatedFields) {
+function update(reservation_id, status) {
   return knex("reservations")
-    .where({ reservation_id: reservationId })
-    .update(updatedFields)
-    .then((reservations) => reservations[0]);
-}
+  .where({ reservation_id })
+  .update({ status })
+  .then(() => read(reservation_id))
+};
 
+function updateReservation(reservation_id, updatedFields) {
+  return knex("reservations")
+    .where({ reservation_id })
+    .update(updatedFields)
+}
 
 
   async function getReservationById(reservationId) {
@@ -64,6 +72,7 @@ module.exports = {
   read,
   update,
   getReservationById,
+  updateReservation,
 };
 
 
