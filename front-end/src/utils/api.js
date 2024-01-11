@@ -167,30 +167,14 @@ export async function fetchReservationsByDate(date, signal) {
 }
 
 
-
-export const deleteSeat = async (table_id, reservation_id) => {
-  try {
-    const response = await fetchJson(`${API_BASE_URL}/tables/${table_id}/seat`, {
-      method: "DELETE",
-      body: JSON.stringify({ data: { reservation_id } }),
-    });
-
-    if (response.ok) {
-      const contentType = response.headers.get("content-type");
-      if (contentType && contentType.includes("application/json")) {
-        return response.json();
-      } else {
-        return { message: "Seat deleted successfully" };
-      }
-    } else {
-      throw new Error(`Failed to delete seat: ${response.statusText}`);
-    }
-  } catch (error) {
-    // Handle or log any errors that occurred during the fetch
-    console.error("Error in deleteSeat:", error);
-    throw error;
-  }
-};
+export async function deleteSeat(table_id, signal){
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  const options = {
+    method: "DELETE",
+    signal
+  };
+  return await fetchJson(url, options);
+}
 
 
 

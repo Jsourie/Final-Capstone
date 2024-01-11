@@ -4,48 +4,38 @@ import ListTables from "./ListTables";
 import ErrorAlert from "../layout/ErrorAlert";
 import ListReservation from "../new reservation/ListReservation";
 
-/**
- * Defines the dashboard page.
- * @param date
- *  the date for which the user wants to view reservations.
- */
 function Dashboard({ date }) {
-  
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
 
-  // Load Dashboard - reservations and tables, remove loading message //
-  useEffect(() => {
-    loadReservationsAndTables();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date]);
-
-  function loadReservations() {
+  const loadReservationsAndTables = () => {
     const abortController = new AbortController();
-    setReservationsError(null);
-    listReservations({ date }, abortController.signal)
-      .then(setReservations)
-      .catch(setReservationsError);
-    return () => abortController.abort();
-  }
+    
+    const loadReservations = () => {
+      setReservationsError(null);
+      listReservations({ date }, abortController.signal)
+        .then(setReservations)
+        .catch(setReservationsError);
+    };
 
-  function loadTables() {
-    const abortController = new AbortController();
-    setTablesError(null);
-    listTables(abortController.signal)
-      .then(setTables)
-      .catch(setTablesError);
-    return () => abortController.abort();
-  }
+    const loadTables = () => {
+      setTablesError(null);
+      listTables(abortController.signal)
+        .then(setTables)
+        .catch(setTablesError);
+    };
 
-  function loadReservationsAndTables() {
-    const abortController = new AbortController();
     loadReservations();
     loadTables();
+
     return () => abortController.abort();
-  }
+  };
+
+  useEffect(() => {
+    loadReservationsAndTables();
+  }, [date]);
 
 
     return (

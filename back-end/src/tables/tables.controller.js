@@ -143,14 +143,15 @@ async function destroy(req, res, next) {
     const { reservation_id } = table;
 
     // Proceed with deleting the seat
-    await service.deleteSeat(table_id, reservation_id);
+    const updatedTable = await service.deleteSeat(table_id, reservation_id);
 
-    // Return a JSON response with a success message
-    res.status(200).json({ message: "Seat deleted successfully" });
+    // Return a JSON response with the updated data
+    res.status(200).json({ message: "Seat deleted successfully", updatedTable });
   } catch (error) {
     next(error);
   }
 }
+
 
   
 
