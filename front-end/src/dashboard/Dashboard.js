@@ -1,107 +1,87 @@
 import React, { useEffect, useState } from "react";
-import { deleteSeat, listReservations, listTables } from "../utils/api";
-import { Link, useHistory } from "react-router-dom";
-import ErrorAlert from "../layout/ErrorAlert";
+import { listReservations, listTables } from "../utils/api";
 import ListTables from "./ListTables";
+import ErrorAlert from "../layout/ErrorAlert";
+import ListReservation from "../new reservation/ListReservation";
 
+/**
+ * Defines the dashboard page.
+ * @param date
+ *  the date for which the user wants to view reservations.
+ */
 function Dashboard({ date }) {
-  const history = useHistory();
-
+  
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
 
-  // Function to load tables
-  const loadTables = async () => {
-    setTablesError(null);
-    try {
-      const data = await listTables();
-      setTables(data);
-    } catch (error) {
-      setTablesError(error);
-    }
-  };
-
+  // Load Dashboard - reservations and tables, remove loading message //
   useEffect(() => {
-    const abortController = new AbortController();
-
-    const loadDashboard = () => {
-      setReservationsError(null);
-      console.log("Fetching reservations for date:", date);
-      listReservations({ date }, abortController.signal)
-        .then((data) => {
-          console.log("Reservations fetched successfully:", data);
-          setReservations(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching reservations:", error);
-          setReservationsError(error);
-        });
-    };
-
-    loadDashboard();
-
-    return () => abortController.abort();
+    loadReservationsAndTables();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
 
-  useEffect(() => {
+  function loadReservations() {
     const abortController = new AbortController();
-
-    // Initial load of tables
-    loadTables();
-
+    setReservationsError(null);
+    listReservations({ date }, abortController.signal)
+      .then(setReservations)
+      .catch(setReservationsError);
     return () => abortController.abort();
-  }, []);
+  }
 
-  const handleFinish = async (tableId, reservationId) => {
-    try {
-      await deleteSeat(tableId, reservationId);
-      // Reload tables after finishing a table
-      await loadTables();
-      history.push("/");
-    } catch (error) {
-      console.error("Error finishing table:", error);
-    }
-  };
+  function loadTables() {
+    const abortController = new AbortController();
+    setTablesError(null);
+    listTables(abortController.signal)
+      .then(setTables)
+      .catch(setTablesError);
+    return () => abortController.abort();
+  }
 
-  return (
-    <main>
-      <h1>Dashboard</h1>
-      <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations for {date}</h4>
-      </div>
-      <ErrorAlert error={reservationsError} />
-      <div className="card-container">
-        {reservations.map((reservation) => (
-          <div key={reservation.reservation_id} className="card">
-            {reservation.status === "booked" && (
-              <Link to={`/reservations/${reservation.reservation_id}/seat`}>
-                <button
-                  className="btn btn-primary"
-                  data-reservation-id-status={reservation.reservation_id}
-                >
-                  Seat
-                </button>
-              </Link>
-            )}
-            <Link to={`/reservations/${reservation.reservation_id}/edit`}>
-              <button className="btn btn-secondary">Edit</button>
-            </Link>
-            <h5 className="card-title">
-              {reservation.last_name}, {reservation.first_name}
-            </h5>
-            <p className="card-text">Date: {reservation.reservation_date}</p>
-            <p className="card-text">Time: {reservation.reservation_time}</p>
-            <p className="card-text">Status: {reservation.status}</p>
+  function loadReservationsAndTables() {
+    const abortController = new AbortController();
+    loadReservations();
+    loadTables();
+    return () => abortController.abort();
+  }
+
+
+    return (
+      <main className="dashboard">
+        <h1>Dashboard</h1>
+        <div className="d-md-flex flex-column">
+          {!reservations.length && <h2>No reservations on this date.</h2>}
+        </div>
+        <ErrorAlert error={reservationsError} setError={setReservationsError} />
+
+        {/* Reservations */}
+        <div className="reservations-list">
+          <h4 className="mb-2">Reservations for {date}</h4>
+          <ListReservation
+            reservations={reservations}
+            setReservationsError={setReservationsError}
+            loadReservationsAndTables={loadReservationsAndTables} 
+          />
+        </div>
+
+      
+
+        {/* Tables */}
+        <div className="tables-list">
+          <div className="d-md-flex mb-3">
+            <h4 className="mb-0">Tables</h4>
           </div>
-        ))}
-      </div>
-      <div className="card-container">
-        <ListTables onFinish={handleFinish} tables={tables} />
-      </div>
-    </main>
-  );
+          {!tables && <h5 className="load-message">Loading...</h5>}
+          <ListTables 
+            tables={tables}
+            setTablesError={setTablesError}
+            loadReservationsAndTables={loadReservationsAndTables} 
+          />
+        </div>
+      </main>
+    );
 }
 
 export default Dashboard;

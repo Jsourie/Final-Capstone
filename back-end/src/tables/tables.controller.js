@@ -127,7 +127,6 @@ async function read(req, res) {
 
 async function destroy(req, res, next) {
   const { table_id } = req.params;
-  
 
   try {
     const table = await service.getTableById(table_id);
@@ -141,17 +140,18 @@ async function destroy(req, res, next) {
       return res.status(400).json({ error: `${table_id} not occupied.` });
     }
 
-    const {reservation_id} = table
+    const { reservation_id } = table;
 
     // Proceed with deleting the seat
     await service.deleteSeat(table_id, reservation_id);
 
-    // Return 200 OK
-    res.sendStatus(200);
+    // Return a JSON response with a success message
+    res.status(200).json({ message: "Seat deleted successfully" });
   } catch (error) {
     next(error);
   }
 }
+
   
 
 module.exports = {

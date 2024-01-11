@@ -1,49 +1,57 @@
-// ListTables.js
 import React from "react";
-import ErrorAlert from "../layout/ErrorAlert";
+import { deleteSeat } from "../utils/api";
 
-function ListTables({ onFinish, tables = [] }) {
-  function handleFinishClick(tableId, reservationId) {
-    if (
-      tableId &&
-      reservationId &&
-      window.confirm(
-        "Is this table ready to seat new guests? This cannot be undone."
-      )
-    ) {
-      onFinish(tableId, reservationId);
-    }
+
+function ListTables({ tables, setTablesError, loadReservationsAndTables }) {
+
+  const handleFinish = (table_id) => {
+  const message = "Is this table ready to seat new guests? This cannot be undone.";
+  if (window.confirm(message)) {
+    deleteSeat(table_id)
+      .then((data) => {
+        console.log("Data after deleteSeat:", data);
+
+        loadReservationsAndTables();
+      })
+      .catch((error) => {
+        console.error("Error in handleFinish:", error);
+        setTablesError("Error finishing table.");
+      });
   }
+};
 
-  const rows = tables.length ? (
-    tables.map((table) => {
-      return (
-        <div className="form-group row" key={table.table_id}>
-          <div className="col-sm-2">{table.table_name}</div>
-          <div className="col-sm-2">{table.capacity}</div>
-          <div className="col-sm-1" data-table-id-status={table.table_id}>
-            {table.reservation_id ? "Occupied" : "Free"}
-          </div>
-          <div className="col-sm-1">
-            {table.reservation_id && (
-              <button
-                type="button"
-                className="btn btn-primary"
-                data-table-id-finish={table.table_id}
-                data-reservation-id-finish={table.reservation_id}
-                onClick={() => handleFinishClick(table.table_id, table.reservation_id)}
+
+return (
+    <div id="tableGrid">
+      {tables.map((table) => (
+        <div className="tables-card" key={table.table_id}>
+          <div className="card">
+            <div className="card-body">
+              <h6 className="card-title">{table.table_name}</h6>
+              <p className="card-subtitle mb-2 text-muted">Reservation {table.reservation_id}</p>
+              <div
+                className={`alert`}
+                id="statusWithFinishButton"
+                role="alert"
+                data-table-id-status={table.table_id}
               >
-                Finish
-              </button>
-            )}
+                {table.reservation_id ? "Occupied" : "Free"}
+                {table.reservation_id && (
+                  <button
+                    type="button"
+                    onClick={() => handleFinish(table.table_id)}
+                    data-table-id-finish={table.table_id}
+                  >
+                    Finish
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      );
-    })
-  ) : (
-    <div>No results</div>
+      ))}
+    </div>
   );
-  return <div className="table">{rows}</div>;
-}
+                } 
 
-export default ListTables;
+export default ListTables
