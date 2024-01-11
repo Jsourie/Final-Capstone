@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { deleteSeat, listReservations, listTables, updateReservation } from "../utils/api";
-import { Link, useParams, useHistory} from "react-router-dom";
+import { deleteSeat, listReservations, listTables } from "../utils/api";
+import { Link, useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
+import ListTables from "./ListTables";
 
 function Dashboard({ date }) {
   const history = useHistory();
@@ -11,9 +12,20 @@ function Dashboard({ date }) {
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
 
+  // Function to load tables
+  const loadTables = async () => {
+    setTablesError(null);
+    try {
+      const data = await listTables();
+      setTables(data);
+    } catch (error) {
+      setTablesError(error);
+    }
+  };
+
   useEffect(() => {
     const abortController = new AbortController();
-  
+
     const loadDashboard = () => {
       setReservationsError(null);
       console.log("Fetching reservations for date:", date);
@@ -27,57 +39,31 @@ function Dashboard({ date }) {
           setReservationsError(error);
         });
     };
-  
+
     loadDashboard();
-  
+
     return () => abortController.abort();
   }, [date]);
-  
 
   useEffect(() => {
     const abortController = new AbortController();
 
-    const loadTables = () => {
-      setTablesError(null);
-      listTables(abortController.signal)
-        .then(setTables)
-        .catch(setTablesError);
-    };
-
+    // Initial load of tables
     loadTables();
 
     return () => abortController.abort();
-  }, []); 
-
-
+  }, []);
 
   const handleFinish = async (tableId, reservationId) => {
-    const confirmed = window.confirm("Is this table ready to seat new guests? This cannot be undone.");
-  
-    if (confirmed) {
-      try {
-        await deleteSeat(tableId);
-        history.push("/");
-      } catch (error) {
-        console.error("Error finishing table:", error);
-      }
+    try {
+      await deleteSeat(tableId, reservationId);
+      // Reload tables after finishing a table
+      await loadTables();
+      history.push("/");
+    } catch (error) {
+      console.error("Error finishing table:", error);
     }
   };
-  
-  
-
-
-  const handleSeated = async (reservationId) => {   
-      try {
-        await updateReservation(reservationId, 'seated');
-        history.push("/");
-      } catch (error) {
-        console.error("Error updating reservation status:", error);
-      }
-    
-  };
-
-
 
   return (
     <main>
@@ -87,50 +73,34 @@ function Dashboard({ date }) {
       </div>
       <ErrorAlert error={reservationsError} />
       <div className="card-container">
-      {reservations.map((reservation) => (
-      <div key={reservation.reservation_id} className="card">
-      {reservation.status === "booked" && (
-        <Link to={`/reservations/${reservation.reservation_id}/seat`}>
-         <button
-  className="btn btn-primary"
-  data-reservation-id-status={reservation.reservation_id} 
-  onClick={() => handleSeated(reservation.reservation_id, reservation)} 
->
-  Seat
-</button>
-
-        </Link>
-      )}
-      <Link to={`/reservations/${reservation.reservation_id}/edit`}>
-        <button className="btn btn-secondary">Edit</button>
-      </Link>
-      <h5 className="card-title">{reservation.last_name}, {reservation.first_name}</h5>
-      <p className="card-text">Date: {reservation.reservation_date}</p>
-      <p className="card-text">Time: {reservation.reservation_time}</p>
-      <p className="card-text">Status: {reservation.status}</p>
-    </div>
-  ))}
-</div>
+        {reservations.map((reservation) => (
+          <div key={reservation.reservation_id} className="card">
+            {reservation.status === "booked" && (
+              <Link to={`/reservations/${reservation.reservation_id}/seat`}>
+                <button
+                  className="btn btn-primary"
+                  data-reservation-id-status={reservation.reservation_id}
+                >
+                  Seat
+                </button>
+              </Link>
+            )}
+            <Link to={`/reservations/${reservation.reservation_id}/edit`}>
+              <button className="btn btn-secondary">Edit</button>
+            </Link>
+            <h5 className="card-title">
+              {reservation.last_name}, {reservation.first_name}
+            </h5>
+            <p className="card-text">Date: {reservation.reservation_date}</p>
+            <p className="card-text">Time: {reservation.reservation_time}</p>
+            <p className="card-text">Status: {reservation.status}</p>
+          </div>
+        ))}
+      </div>
       <div className="card-container">
-  {tables.map((table) => (
-    <div key={table.table_id} className="card">
-      <h5 className="card-title">{table.table_name}, {table.capacity}</h5>
-      <p data-table-id-status={table.table_id}>
-        {table.reservation_id ? "Occupied" : "Free"} 
-      </p>
-      {table.reservation_id && (
-        <button
-          className="btn btn-primary"
-          data-table-id-finish={table.table_id}
-          onClick={() => handleFinish(table.table_id)}
-        >
-          Finish
-        </button>
-      )}
-    </div>
-  ))}
-</div>
-</main>
+        <ListTables onFinish={handleFinish} tables={tables} />
+      </div>
+    </main>
   );
 }
 

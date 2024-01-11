@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { listTables, listReservations, assignTableToReservation } from "../utils/api";
+import { listTables, readReservation, seatReservation } from "../utils/api";
 
 function ReservationSeat() {
   const history = useHistory();
@@ -8,9 +8,9 @@ function ReservationSeat() {
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
-  const [tablesError, setTablesError] = useState(null);
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
+  const [tablesError, setTablesError] = useState(null);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -24,8 +24,8 @@ function ReservationSeat() {
 
     const loadReservations = () => {
       setReservationsError(null);
-      listReservations(abortController.signal)
-        .then(setReservations)
+      readReservation(reservation_id, abortController.signal)
+        .then((reservation) => setReservations([reservation]))
         .catch(setReservationsError);
     };
 
@@ -33,19 +33,42 @@ function ReservationSeat() {
     loadReservations();
 
     return () => abortController.abort();
-  }, []);
+  }, [reservation_id]);
 
-  const reservation = reservations.find((r) => r.reservation_id === Number(reservation_id));
+  const reservation = reservations[0];
 
   const handleTableChange = (event) => {
     setSelectedTable(event.target.value);
   };
 
+  const validate = (table_id) => {
+    const errors = [];
+    const selectedTable = tables.find((table) => table.table_id === Number(table_id));
+    if (selectedTable.reservation_id) {
+      errors.push(new Error(`Table ${table_id} is occupied`));
+    }
+
+    if (reservation.people > selectedTable.capacity) {
+      errors.push(
+        new Error(`Table capacity not big enough to fit a party of ${reservation.people}`)
+      );
+    }
+    return errors;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Validate the selected table
+    const validationErrors = validate(selectedTable);
+
+    if (validationErrors.length > 0) {
+      setErrorMessage(validationErrors.map((error) => error.message).join(" "));
+      return;
+    }
+
     try {
-      await assignTableToReservation(selectedTable, reservation_id);
+      await seatReservation(selectedTable, reservation_id);
       history.push("/dashboard");
     } catch (error) {
       console.error("Error assigning table:", error);
@@ -56,10 +79,6 @@ function ReservationSeat() {
   const handleCancel = () => {
     history.goBack();
   };
-
-  const availableTables = tables.filter(
-    (table) => table.capacity >= reservation?.people && table.reservation_id === null
-  );
 
   return (
     <div>
@@ -77,7 +96,7 @@ function ReservationSeat() {
             <option value="" disabled>
               Select a table
             </option>
-            {availableTables.map((table) => (
+            {tables.map((table) => (
               <option key={table.table_id} value={table.table_id}>
                 {table.table_name} - {table.capacity}
               </option>

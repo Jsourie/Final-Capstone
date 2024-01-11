@@ -95,7 +95,7 @@ export async function listTables(params, signal) {
 }
 
 
-export const assignTableToReservation = async (table_id, reservation_id) => {
+export const seatReservation = async (table_id, reservation_id) => {
   const response = await fetch(`${API_BASE_URL}/tables/${table_id}/seat`, {
     method: "PUT",
     headers: {
@@ -168,11 +168,15 @@ export async function fetchReservationsByDate(date, signal) {
 
 
 
-export async function deleteSeat(table_id, signal) {
+export async function deleteSeat(table_id) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
-  const options = { method: "DELETE", signal };
-  return await fetchJson(url, options);
+  const options = {
+    method: "DELETE",
+    headers,
+  };
+  return await fetchJson(url, options, {});
 }
+
 
 
 export async function updateReservation(reservation_id, newStatus, signal) {
@@ -186,3 +190,20 @@ export async function readReservation(reservation_id, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
   const options = { method: "GET", signal };
   return await fetchJson(url, options);}
+
+
+  export async function cancelReservation(reservation_id, signal) {
+    const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+    const options = {
+      method: "PUT",
+      mode: "cors",
+      headers,
+      body: JSON.stringify({
+        data: {
+          status: "cancelled",
+        },
+      }),
+      signal,
+    };
+    return await fetchJson(url, options, {});
+  }
