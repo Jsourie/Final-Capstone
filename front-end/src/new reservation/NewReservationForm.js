@@ -1,6 +1,6 @@
 import React from "react";
 
-function NewReservationForm({ formData, handleInputChange, handleSubmit, goBack }) {
+function NewReservationForm({ formData ={}, handleInputChange, handleSubmit, goBack }) {
  
     const {
         first_name,
