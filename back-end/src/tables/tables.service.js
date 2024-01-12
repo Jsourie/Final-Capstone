@@ -12,6 +12,7 @@ async function list() {
 }
 
 
+
 async function create(table) {
   return knex("tables")
     .insert(table)
@@ -31,6 +32,13 @@ async function updateTable(tableId, reservationId) {
     .update({ status: "seated" });
 
   return updatedTable;
+}
+
+function read(table_id) {
+  return knex("tabless")
+  .select("*")
+  .where({ table_id })
+  .first()
 }
 
 
@@ -67,6 +75,7 @@ module.exports = {
   updateTable,
   getTableById,
   getReservationById,
+  read,
   deleteSeat
 };
 

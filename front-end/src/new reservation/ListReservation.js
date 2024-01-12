@@ -36,7 +36,7 @@ function ListReservation({
           </div>
 
           <div className="card-footer border-secondary text-secondary">
-            {reservation.status === "booked" && (
+            {reservation.status === "booked" && reservation.status !== "seated" && (
               <Link
                 to={`/reservations/${reservation.reservation_id}/seat`}
                 className="btn btn-secondary"
@@ -45,10 +45,10 @@ function ListReservation({
               </Link>
             )}
 
-            <h5>
-              <span data-reservation-id-status={reservation.reservation_id}>
-                {reservation.status}
-              </span>
+            <h5
+              data-reservation-id-status={reservation.reservation_id}
+            >
+              {reservation.status}
             </h5>
           </div>
         </div>

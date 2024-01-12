@@ -47,10 +47,13 @@ function update(reservation_id, status) {
   .then(() => read(reservation_id))
 };
 
-function updateReservation(reservation_id, updatedFields) {
+
+function updateReservation(reservation) {
   return knex("reservations")
-    .where({ reservation_id })
-    .update(updatedFields)
+    .select("*")
+    .where({ reservation_id: reservation.reservation_id })
+    .update(reservation)
+    .then(() => read(reservation.reservation_id));
 }
 
 
