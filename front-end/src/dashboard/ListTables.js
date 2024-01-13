@@ -30,7 +30,7 @@ function ListTables({ tables, setTablesError, loadReservationsAndTables }) {
               <h6 className="card-title">{table.table_name}</h6>
               <p className="card-subtitle mb-2 text-muted">Reservation {table.reservation_id}</p>
               <div
-                className={`alert ${table.reservation_id ? "alert-warning" : "alert-success"}`}
+               
                 id="statusWithFinishButton"
                 role="alert"
                 data-table-id-status={table.table_id}

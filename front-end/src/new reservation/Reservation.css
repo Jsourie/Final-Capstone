@@ -1,0 +1,8 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+
+/* Apply the font to H2 headers with fallbacks */
+h2 {
+  font-family: 'Open Sans', 'Montserrat', 'Roboto Condensed', sans-serif;
+  font-weight: 300; /* Setting the font weight to 300 */
+}

@@ -3,6 +3,8 @@ import { listReservations, listTables } from "../utils/api";
 import ListTables from "./ListTables";
 import ErrorAlert from "../layout/ErrorAlert";
 import ListReservation from "../new reservation/ListReservation";
+import './Dashboard.css';
+
 
 function Dashboard({ date }) {
   const [reservations, setReservations] = useState([]);
@@ -40,7 +42,7 @@ function Dashboard({ date }) {
 
     return (
       <main className="dashboard">
-        <h1>Dashboard</h1>
+        <h1>Reservation Dashboard</h1>
         <div className="d-md-flex flex-column">
           {!reservations.length && <h2>No reservations on this date.</h2>}
         </div>

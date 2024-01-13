@@ -1,0 +1,37 @@
+/* Dashboard.css */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap');
+
+/* Add other styles as needed */
+
+/* Apply the font to H1 headers with fallbacks */
+h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    /* Add other styling as needed */
+  }
+
+
+  div {
+    /* Your common styles for all div containers */
+    font-family: 'Rubik', sans-serif;
+    /* Add other styles as needed */
+  }
+  
+
+/* Add additional styling for other elements if necessary */
+.dashboard {
+  /* Add styles for the main container if needed */
+}
+
+/* Add other styles for specific components as needed */
+.reservations-list {
+  /* Add styles for the reservations list if needed */
+}
+
+.tables-list {
+  /* Add styles for the tables list if needed */
+}

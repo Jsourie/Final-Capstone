@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { listReservations, cancelReservation } from "../utils/api";
-import ListReservation from "./ListReservation"; // Import the ListReservation component
+import ListReservation from "./ListReservation"; 
 
 function SearchReservation() {
   const [reservations, setReservations] = useState([]);
@@ -22,8 +22,6 @@ function SearchReservation() {
       .catch(setErrors);
   };
 
-
-  // Use the ListReservation component here
   const reservationList = reservations.length ? (
     <ListReservation
       reservations={reservations}
@@ -35,7 +33,7 @@ function SearchReservation() {
   return (
     <main>
       <h3>Search for reservation by phone number</h3>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="mb-3">
         <label>
           <input
             type="text"
