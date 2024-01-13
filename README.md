@@ -58,8 +58,7 @@ Error messages displayed on the /reservations/new page for validation failures.
 
 
 
-![Alt text](Screenshot 2024-01-13 at 2.37.58 PM.png)
-
+![Screenshot](Screenshot%202024-01-13%20at%202.31.03%20PM.png)
 
 
 
@@ -69,11 +68,11 @@ Creation of tables with required fields.
 Assigning a table to an existing reservation based on availability and capacity requirements.
 
 
-![Alt text](<img width="757" alt="Screenshot 2024-01-13 at 2 31 03 PM" src="https://github.com/Jsourie/Final-Capstone/assets/135664388/ed5ed70a-f214-40b1-9d8c-c6444ef098fc">)
+![Screenshot PM](Screenshot%202024-01-13%20at%202.33.57%20PM.png)
 
 
+![Screenshot  PM](Screenshot%202024-01-13%20at%202.36.12%20PM.png)
 
-![Alt text](<img width="757" alt="Screenshot 2024-01-13 at 2 33 57 PM" src="https://github.com/Jsourie/Final-Capstone/assets/135664388/31b5c67e-a06e-42e8-826d-25e8e7dd62e4">)
 
 
 Search
@@ -81,8 +80,8 @@ Search
 Allows user to search reservations by phone number.
 Ability to edit, seat, or cancel based on search results.
 
+![Screenshot PM](Screenshot%202024-01-13%20at%202.37.58%20PM.png)
 
-![Alt text](<img width="757" alt="Screenshot 2024-01-13 at 2 37 58 PM" src="https://github.com/Jsourie/Final-Capstone/assets/135664388/2c8f80c6-5c00-491b-8d6f-514792447014">)
 
 
 
