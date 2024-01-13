@@ -30,7 +30,10 @@ function EditReservation() {
           reservation_id,
           abortController.signal
         );
-        setFormData(reservationDetails); // Set form data to the fetched reservation details
+    
+        const formattedReservationDetails = formatReservationDate(reservationDetails);
+    
+        setFormData(formattedReservationDetails);
       } catch (error) {
         console.error("Error fetching reservation details:", error);
         setError(error);
@@ -61,29 +64,27 @@ function EditReservation() {
     };
   
     editReservation(reservation_id, formattedFormData)
-      .then(() => {
-        setFormData({ ...initialFormState });
-        const reservationDate = formData.reservation_date;
+      .then((updatedData) => {
+        setFormData(updatedData); 
+        const reservationDate = updatedData.reservation_date;
         const dashboardRoute = `/dashboard?date=${reservationDate}`;
         history.push(dashboardRoute);
       })
       .catch((error) => {
-        console.error("Error creating reservation:", error);
+        console.error("Error updating reservation:", error);
         setError(error);
       });
   }
   
 
-  const goBack = () => {
-    history.goBack();
-  };
+ 
 
   return (
     <NewReservationForm
       formData={formData}
       handleInputChange={handleInputChange}
       handleSubmit={handleSubmit}
-      goBack={goBack}
+     
     />
   );
 }

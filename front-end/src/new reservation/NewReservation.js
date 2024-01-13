@@ -74,9 +74,7 @@ function NewReservation() {
     });
 };
 
-  const goBack = () => {
-    history.goBack();
-  };
+ 
 
   return (
     <div>
@@ -85,7 +83,7 @@ function NewReservation() {
         formData={formData}
         handleInputChange={handleInputChange}
         handleSubmit={handleSubmit}
-        goBack={goBack}
+        
       />
     </div>
   );

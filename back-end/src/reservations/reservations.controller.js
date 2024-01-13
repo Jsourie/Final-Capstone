@@ -218,55 +218,7 @@ async function reservationExists(req, res, next) {
 }
 
 //////////////////////update reservation///////////
-async function updateReservationTest(req, res, next) {
-  try {
-    const { reservation_id } = req.params; 
-    const updatedFields = { ...req.body.data }; 
 
-    // Validate required fields are not missing or empty
-    const requiredFields = ['first_name', 'last_name', 'mobile_number', 'reservation_date', 'reservation_time', 'people'];
-    const emptyFields = requiredFields.filter(field => !updatedFields[field] || updatedFields[field] === "");
-
-    if (emptyFields.length > 0) {
-      return res.status(400).json({ error: `${emptyFields.join(', ')} ${emptyFields.length > 1 ? 'are' : 'is'} required.` });
-    }
-
-    // Validate reservation_date is a date
-    const { reservation_date } = updatedFields;
-    const dateFormat = /^\d{4}-\d{1,2}-\d{1,2}$/;
-
-    if (!dateFormat.test(reservation_date)) {
-      return res.status(400).json({ error: `Invalid date format for reservation_date.` });
-    }
-
-    // Validate reservation_time is a time
-    const { reservation_time } = req.body.data;
-    const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
-
-    if (!reservation_time || !reservation_time.match(timeRegex)) {
-      return res.status(400).json({ error: 'Invalid time format for reservation_time.' });
-    }
-
-    // Validate people is a number
-    const { people } = updatedFields;
-
-    if (!Number.isInteger(people) || people <= 0) {
-      return res.status(400).json({ error: "people must be a positive integer." });
-    }
-
-    // Proceed with updating the reservation if all validations pass
-    const updatedReservation = await service.updateReservation(reservation_id, updatedFields);
-
-    // Respond with the updated data in the desired format
-    res.status(200).json({ data: updatedReservation });
-  } catch (error) {
-    console.error('Error updating reservation:', error);
-    next({
-      status: 500,
-      message: 'Internal Server Error',
-    });
-  }
-}
 
 async function validateUpdate(req, res, next) {
   try {

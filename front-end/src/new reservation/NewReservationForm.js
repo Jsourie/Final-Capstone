@@ -1,15 +1,11 @@
 import React from "react";
+import { useHistory } from "react-router-dom";
 
-function NewReservationForm({ formData ={}, handleInputChange, handleSubmit, goBack }) {
- 
-    const {
-        first_name,
-        last_name,
-        mobile_number,
-        reservation_date,
-        reservation_time,
-        people,
-      } = formData;
+function NewReservationForm({ formData = {}, handleInputChange, handleSubmit }) {
+  const history = useHistory();
+
+  const { first_name, last_name, mobile_number, reservation_date, reservation_time, people } = formData;
+
 
   return (
     <div className="container">
@@ -90,9 +86,13 @@ function NewReservationForm({ formData ={}, handleInputChange, handleSubmit, goB
     required
   />
 </div>
-    <button onClick={goBack} className="btn btn-danger mr-2">
-              Cancel
-     </button>
+<button
+          type="button"
+          className="btn btn-secondary mr-2"
+          onClick={() => history.goBack()}
+        >
+          Cancel
+        </button>
         <button className="btn btn-primary" type="submit">
               Submit
             </button>

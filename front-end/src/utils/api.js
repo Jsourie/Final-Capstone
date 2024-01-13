@@ -213,11 +213,10 @@ export async function readReservation(reservation_id, signal) {
   return await fetchJson(url, options);}
 
 
-  export async function cancelReservation(reservation_id, signal) {
-    const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+  export async function cancelReservation(reservation_id, status, signal) {
+    const url = `${API_BASE_URL}/reservations/${reservation_id}/status`
     const options = {
       method: "PUT",
-      mode: "cors",
       headers,
       body: JSON.stringify({
         data: {
@@ -226,5 +225,6 @@ export async function readReservation(reservation_id, signal) {
       }),
       signal,
     };
-    return await fetchJson(url, options, {});
+    return await fetchJson(url, options);
   }
+  

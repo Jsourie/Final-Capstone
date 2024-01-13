@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { listReservations, cancelReservation } from "../utils/api";
-import ReservationList from "./ReservationList";
+import ListReservation from "./ListReservation"; // Import the ListReservation component
 
 function SearchReservation() {
   const [reservations, setReservations] = useState([]);
@@ -22,21 +22,14 @@ function SearchReservation() {
       .catch(setErrors);
   };
 
-  const onCancel = (reservation_id) => {
-    const abortController = new AbortController();
-    cancelReservation(reservation_id, abortController.signal)
-      .then(loadReservations);
-    return () => abortController.abort();
-  };
 
+  // Use the ListReservation component here
   const reservationList = reservations.length ? (
-    <ul>
-      {reservations.map((res) => (
-        <li key={res.reservation_id}>
-          <ReservationList onCancel={onCancel} reservation={res} />
-        </li>
-      ))}
-    </ul>
+    <ListReservation
+      reservations={reservations}
+      setReservationsError={setErrors}
+      loadReservationsAndTables={loadReservations}
+    />
   ) : <p>No reservations found</p>;
 
   return (
@@ -55,9 +48,9 @@ function SearchReservation() {
           />
         </label>
         <button type="submit" className="btn btn-primary">
-  Find
-</button>
- </form>
+          Find
+        </button>
+      </form>
       {reservationList}
     </main>
   );

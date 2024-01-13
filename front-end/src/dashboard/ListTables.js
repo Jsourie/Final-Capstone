@@ -12,7 +12,6 @@ function ListTables({ tables, setTablesError, loadReservationsAndTables }) {
         .then((data) => {
           console.log("Data after deleteSeat:", data);
           loadReservationsAndTables();
-          window.location.reload();
         })
         .catch((error) => {
           console.error("Error in handleFinish:", error);
