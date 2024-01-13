@@ -109,7 +109,6 @@ async function validateAndCreate(req, res) {
       return res.status(400).json({ error: "seated" });
     }
 
-    // If all validations pass, proceed with creating the reservation
     const data = await service.create(req.body.data);
     res.status(201).json({ data });
 
@@ -118,7 +117,6 @@ async function validateAndCreate(req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
-////////////////////////////////////////////////////////////////////
 
 async function list(req, res) {
   try {
@@ -168,7 +166,6 @@ async function listByDateOrMobileNumber(req, res) {
   }
 }
 
-////////////////
 async function updateStatus(req, res, next) {
   try {
     // Check if the reservation is not finished
@@ -215,7 +212,6 @@ async function reservationExists(req, res, next) {
   })
 }
 
-//////////////////////update reservation///////////
 
 
 async function validateUpdate(req, res, next) {
@@ -223,7 +219,6 @@ async function validateUpdate(req, res, next) {
     const { reservation_id } = req.params; 
     const updatedFields = { ...req.body.data }; 
 
-    // Validate required fields are not missing or empty
     const requiredFields = ['first_name', 'last_name', 'mobile_number', 'reservation_date', 'reservation_time', 'people'];
     const emptyFields = requiredFields.filter(field => !updatedFields[field] || updatedFields[field] === "");
 
@@ -231,7 +226,7 @@ async function validateUpdate(req, res, next) {
       return res.status(400).json({ error: `${emptyFields.join(', ')} ${emptyFields.length > 1 ? 'are' : 'is'} required.` });
     }
 
-    // Validate reservation_date is a date
+    
     const { reservation_date } = updatedFields;
     const dateFormat = /^\d{4}-\d{1,2}-\d{1,2}$/;
 
@@ -239,7 +234,7 @@ async function validateUpdate(req, res, next) {
       return res.status(400).json({ error: `Invalid date format for reservation_date.` });
     }
 
-    // Validate reservation_time is a time
+    
     const { reservation_time } = updatedFields;
     const timeRegex = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
 
@@ -247,17 +242,16 @@ async function validateUpdate(req, res, next) {
       return res.status(400).json({ error: 'Invalid time format for reservation_time.' });
     }
 
-    // Validate people is a number
     const { people } = updatedFields;
 
     if (!Number.isInteger(people) || people <= 0) {
       return res.status(400).json({ error: "people must be a positive integer." });
     }
 
-    // Attach the validated data to the response locals
+    
     res.locals.validatedData = { reservation_id, updatedFields };
 
-    next(); // Proceed to the next middleware
+    next(); 
   } catch (error) {
     console.error('Error validating update:', error);
     next({
@@ -266,7 +260,6 @@ async function validateUpdate(req, res, next) {
     });
   }
 }
-
 
 
 
