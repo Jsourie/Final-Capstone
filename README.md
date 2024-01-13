@@ -39,7 +39,7 @@ Special attention to parsing and handling dates and times to prevent issues.
 Navigation:
 Allows user to interact with the different locations in the application:
 
-![Final-Capstone Screenshot](Final-Capstone/Screenshot%202024-01-13%20at%202.24.42%20PM.png)
+![Final-Capstone Screenshot](Screenshot%202024-01-13%20at%202.24.42%20PM.png)
 
 
 
@@ -57,7 +57,7 @@ Error messages displayed on the /reservations/new page for validation failures.
 ![New Screenshot](Final-Capstone/Screenshot%202024-01-13%20at%202.28.30%20PM.png)
 
 
-![Alt text](<img width="757" alt="Screenshot 2024-01-13 at 2 36 12 PM" src="https://github.com/Jsourie/Final-Capstone/assets/135664388/6749d85b-c55e-4306-a411-a233a98b1305">)
+![Alt text](Screenshot 2024-01-13 at 2.37.58 PM.png)
 
 
 
