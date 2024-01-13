@@ -76,32 +76,40 @@ async function validateAndCreate(req, res) {
     }
     
 
-    // Validate time constraints
     const currentDate = new Date();
     const selectedDateTime = new Date(`${reservation_date} ${reservation_time}`);
     const openingTime = new Date(`${reservation_date} 10:30:00`);
     const closingTime = new Date(`${reservation_date} 21:30:00`);
-
+    
+    const errors = [];
+    
     // Validate reservation_date is a Tuesday
     if (selectedDateTime.getDay() === 2) {
-      return res.status(400).json({ error: "The restaurant is closed on Tuesdays." });
-    }
-
-    // Validate reservation_date is in the future
-    if (selectedDateTime <= currentDate) {
-      return res.status(400).json({ error: "Reservation date must be in the future." });
-    }
-
-    // Validate reservation_time is after 10:30 AM
-    if (selectedDateTime < openingTime) {
-      return res.status(400).json({ error: "Reservation time must be after 10:30 AM." });
-    }
-
-    // Validate reservation_time is before 9:30 PM
-    if (selectedDateTime > closingTime) {
-      return res.status(400).json({ error: "Reservation time must be before 9:30 PM." });
+      errors.push("The restaurant is closed on Tuesdays.");
     }
     
+    // Validate reservation_date is in the future
+    if (selectedDateTime < currentDate) {
+      errors.push("Reservation date must be in the future.");
+    }
+    
+    // Validate reservation_time is after 10:30 AM
+    if (selectedDateTime < openingTime) {
+      errors.push("Reservation time must be after 10:30 AM.");
+    }
+    
+    // Validate reservation_time is before 9:30 PM
+    if (selectedDateTime > closingTime) {
+      errors.push("Reservation time must be before 9:30 PM.");
+    }
+    
+    console.log(errors)
+
+    if (errors.length > 0) {
+      return res.status(400).json({ errors });
+    }
+    
+
     const {status} = req.body.data
     if ( status === "finished") {
       return res.status(400).json({ error: "finished" });
@@ -279,14 +287,110 @@ async function updateReservation(req, res, _next) {
   res.json({ data });
 }
 
+/////////////////////////////////////////////////////////////////////
+
+
+function validateDateTime(req, res, next) {
+  const { reservation_date, reservation_time } = req.body.data;
+
+  const currentDate = new Date();
+  const selectedDateTime = new Date(`${reservation_date} ${reservation_time}`);
+  const openingTime = new Date(`${reservation_date} 10:30:00`);
+  const closingTime = new Date(`${reservation_date} 21:30:00`);
+
+  const errors = [];
+
+  // Validate reservation_date is a Tuesday
+  if (selectedDateTime.getDay() === 2) {
+    errors.push("The restaurant is closed on Tuesdays.");
+  }
+
+  // Validate reservation_date is in the future
+  if (selectedDateTime <= currentDate) {
+    errors.push("Reservation date must be in the future.");
+  }
+
+  // Validate reservation_time is after 10:30 AM
+  if (selectedDateTime < openingTime) {
+    errors.push("Reservation time must be after 10:30 AM.");
+  }
+
+  // Validate reservation_time is before 9:30 PM
+  if (selectedDateTime > closingTime) {
+    errors.push("Reservation time must be before 9:30 PM.");
+  }
+
+  if (errors.length > 0) {
+    return res.status(400).json({ errors });
+  }
+
+  next();
+}
+
+
+
+
+function validateStatus(status) {
+  const errors = [];
+
+  if (status === "finished") {
+    errors.push({ status: 400, message: "Reservation cannot have a status of 'finished'." });
+  }
+
+  if (status === "seated") {
+    errors.push({ status: 400, message: "Reservation cannot have a status of 'seated'." });
+  }
+
+  return errors;
+}
+
+function isStatusValid(req, res, next) {
+  const { status } = req.body.data;
+  const statusErrors = validateStatus(status);
+
+  if (statusErrors.length > 0) {
+    return next(statusErrors);
+  }
+
+  next();
+}
+
+
+
+
+async function create(req, res, next) {
+  const reservation = req.body.data;
+  const { status } = reservation;
+
+  if (status && (status === "seated" || status === "finished")) {
+    return next({
+      status: 400,
+      message: status,
+    });
+  }
+  reservation.status = "booked";
+  const data = await service.create(req.body.data);
+  if (data) return res.status(201).json({ data });
+  next({
+    status: 500,
+    message: "Failed to create reservation",
+  });
+}
+
+
+
+
+
+
 
 module.exports = {
   read: asyncErrorBoundary(read),
-  create: asyncErrorBoundary(validateAndCreate),
   filterDate: asyncErrorBoundary(filterDate),
   list: asyncErrorBoundary(list),
   listByDateOrMobileNumber: asyncErrorBoundary(listByDateOrMobileNumber),
   searchReservation: asyncErrorBoundary(searchReservation),
   update:[asyncErrorBoundary(reservationExists),asyncErrorBoundary(updateStatus)],
   updateReservation:[asyncErrorBoundary(reservationExists), asyncErrorBoundary(validateUpdate),asyncErrorBoundary(updateReservation)],
+  create:[asyncErrorBoundary(validateUpdate),asyncErrorBoundary(validateDateTime),asyncErrorBoundary(create)],
+
 };
