@@ -53,8 +53,9 @@ Error messages displayed on the /reservations/new page for validation failures.
 Additional validation checks for creating reservations during business hours.
 Error messages displayed on the /reservations/new page for validation failures.
 
+![Screenshot](Screenshot%202024-01-13%20at%202.28.30%20PM.png)
 
-![New Screensho](Screenshot 2024-01-13 at 2.28.30 PM.png)
+
 
 
 ![Alt text](Screenshot 2024-01-13 at 2.37.58 PM.png)
