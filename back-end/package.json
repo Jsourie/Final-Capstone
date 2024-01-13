@@ -22,8 +22,11 @@
     "test:8": "npm run test -- us-08",
     "test:drop-database": "node test/drop-database",
     "test:start": "npx cross-env LOG_LEVEL=warn NODE_ENV=test npm run test:start:run",
-    "test:start:run": "run-s test:drop-database start "
+    "test:start:run": "run-s test:drop-database start ",
+    "build": "echo 'Custom build script here'"
   },
+
+
   "keywords": [],
   "author": "",
   "license": "UNLICENSED",
@@ -44,4 +47,7 @@
     "nodemon": "^2.0.6",
     "supertest": "^6.1.1"
   }
+
+ 
+
 }
