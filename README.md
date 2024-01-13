@@ -1,158 +1,92 @@
-# Capstone: Restaurant Reservation System
+The application is a reservation system for a restaurant, providing functionalities for creating, managing, and editing reservations, as well as seating and freeing up tables. It involves various user stories (US) that address different aspects of the reservation and seating process. 
 
-> You have been hired as a full stack developer at _Periodic Tables_, a startup that is creating a reservation system for fine dining restaurants.
-> The software is used only by restaurant personnel when a customer calls to request a reservation.
-> At this point, the customers will not access the system online.
+Frontend:
 
-There are no user stories for deployment: it is expected that you will deploy the application to production after you finish a user story.
+React is used for building the frontend components.
+Forms are created for reservation creation and editing.
+Display pages for reservations, tables, and search results.
 
-There are no user stories for logging: it is expected that you will add logging to the application with enough detail to help you diagnose issues in production.
+Backend:
 
-## Existing files
+Node.js with Express is likely used for building the backend server.
+RESTful API for handling reservations, tables, and search functionality.
+Database (likely PostgreSQL) for storing reservation and table data.
+Database:
 
-This repository is set up as a *monorepo*, meaning that the frontend and backend projects are in one repository. This allows you to open both projects in the same editor.
+Reservations and tables tables in the database.
+Foreign key references for associating reservations with tables.
+Validation:
 
-As you work through the user stories listed later in this document, you will be writing code that allows your frontend and backend applications to talk to each other. You will also write code to allow your controllers and services to connect to, and query, your PostgreSQL database via [Knex](http://knexjs.org/).
+Backend validation for ensuring data integrity and adherence to business rules.
+Frontend validation for providing a seamless user experience.
 
-The table below describes the folders in this starter repository:
+Testing:
 
-| Folder/file path | Description                                                      |
-| ---------------- | ---------------------------------------------------------------- |
-| `./back-end`     | The backend project, which runs on `localhost:5001` by default.  |
-| `./front-end`    | The frontend project, which runs on `localhost:3000` by default. |
+Unit tests for backend API endpoints and functions.
+End-to-end tests to validate the entire reservation flow.
+User Interface:
 
-This starter code closely follows the best practices and patterns established in the Robust Server Structure module.
+Bootstrap or a similar framework for a responsive and visually appealing UI.
+Error Handling:
 
-**Note**: Please do not submit a pull request to this repository with your solution.
+Proper error handling and display of error messages to users.
 
-### Backend Existing files
+Date and Time Handling:
 
-The `./back-end` folder contains all the code for the backend project.
+Special attention to parsing and handling dates and times to prevent issues.
 
-The table below describes the existing files in the `./back-end` folder:
 
-| Folder/file path                                         | Description                                                                                                         |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `./back-end/knexfile.js`                                 | The Knex configuration file. You will not need to make changes to this file.                                        |
-| `./back-end/src/app.js`                                  | Defines the Express application and connects routers.                                                               |
-| `./back-end/src/db/connection.js`                        | The Knex connection file. You will not need to make changes to this file.                                           |
-| `./back-end/src/db/migrations`                           | The Knex migrations folder.                                                                                         |
-| `./back-end/src/db/seeds/`                               | The Knex seeds folder.                                                                                              |
-| `./back-end/src/errors/errorHandler.js`                  | Defined an Express API error handler.                                                                               |
-| `./back-end/src/errors/notFound.js`                      | Defined an Express API "not found" handler.                                                                         |
-| `./back-end/src/reservations/reservations.controller.js` | A controller for the reservations resource.                                                                         |
-| `./back-end/src/reservations/reservations.router.js`     | A router for the reservations resource.                                                                             |
-| `./back-end/src/server.js`                               | Defines the node server.                                                                                            |
-| `./back-end/test`                                        | A folder that contains all of the integration tests. You will not need to make changes to the files in this folder. |
-| `./back-end/vercel.json`                                 | A vercel deployment configuration file. You will not need to make changes to this file.                             |
+Navigation:
+Allows user to interact with the different locations in the application:
 
-### Frontend Existing files
+![Final-Capstone Screenshot](Screenshot%202024-01-13%20at%202.24.42%20PM.png)
 
-The `./front-end` folder contains all the code for the frontend project.
 
-The table below describes the existing files in the `./front-end` folder:
 
-| Folder/file path                                   | Description                                                                                            |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `./front-end/e2e`                                  | Contains all of the end-to-end tests. You will not need to make changes to the files in this folder.   |
-| `./front-end/jest-puppeteer.config.js`             | A configuration file used by the end-to-end tests. You will not need to make changes to this file.     |
-| `./front-end/src/App.js`                           | Defines the root application component. You will not need to make changes to this file.                |
-| `./front-end/src/App.test.js`                      | Contains the tests for the root application component. You will not need to make changes to this file. |
-| `./front-end/src/dashboard/Dashboard.js`           | Defines the Dashboard page.                                                                            |
-| `./front-end/src/index.js`                         | The main entry point for the React application.                                                        |
-| `./front-end/src/layout/ErrorAlert.js`             | Defines an error alert component that display only when an error is specified.                         |
-| `./front-end/src/layout/Layout.css`                | The css for the Layout component.                                                                      |
-| `./front-end/src/layout/Layout.js`                 | Defines the main layout of the application.                                                            |
-| `./front-end/src/layout/Menu.js`                   | Defines the menu for the application.                                                                  |
-| `./front-end/src/layout/NotFound.js`               | Defines the "Not found" component that is displayed when no route matches.                             |
-| `./front-end/src/layout/Routes.js`                 | Defines all the routes for the application.                                                            |
-| `./front-end/src/utils/api.js`                     | Defines the functions used to access the backend API                                                   |
-| `./front-end/src/utils/date-time.js`               | Defines functions to format date and time strings.                                                     |
-| `./front-end/src/utils/format-reservation-date.js` | Defines a function to format the date on a single reservation or an array of reservations.             |
-| `./front-end/src/utils/format-reservation-time.js` | Defines a function to format the time on a single reservation or an array of reservations.             |
-| `./front-end/src/utils/useQuery.js`                | Defines a custom hook to parse the query parameters from the URL.                                      |
+Create and Dashboard:
 
-## Database setup
+Creation of reservations through a form with required fields.
+Display of reservation details on the dashboard, sortable by date and time.
+Navigation through different dates with next, previous, and today buttons.
+Validation checks for creating reservations on working days and in the future.
+Error messages displayed on the /reservations/new page for validation failures.
+Additional validation checks for creating reservations during business hours.
+Error messages displayed on the /reservations/new page for validation failures.
 
-1. Set up four new PostgreSQL database instances - development, test, preview, and production - by following the instructions in the "PostgreSQL: Creating & Deleting Databases" lesson.
-1. After setting up your database instances, connect DBeaver to your new database instances by following the instructions in the "PostgreSQL: Installing DBeaver" checkpoint.
+![Screenshot](Screenshot%202024-01-13%20at%202.28.30%20PM.png)
 
-### Knex
 
-Run `npx knex` commands from within the `back-end` folder, which is where the `knexfile.js` file is located.
 
-## Installation
 
-1. Fork and clone this repository.
-1. Run `cp ./back-end/.env.sample ./back-end/.env`.
-1. Update the `./back-end/.env` file with the connection URL's to your PostgreSQL database instance.
-1. Run `cp ./front-end/.env.sample ./front-end/.env`.
-1. You should not need to make changes to the `./front-end/.env` file unless you want to connect to a backend at a location other than `http://localhost:5001`.
-1. Run `npm install` to install project dependencies.
-1. Run `npm run start:dev` to start your server in development mode.
+![Screenshot](Screenshot%202024-01-13%20at%202.31.03%20PM.png)
 
-If you have trouble getting the server to run, reach out for assistance.
 
-## Running tests
 
-This project has unit, integration, and end-to-end (e2e) tests. You have seen unit and integration tests in previous projects.
-End-to-end tests use browser automation to interact with the application just like the user does.
-Once the tests are passing for a given user story, you have implemented the necessary functionality.
+Seat reservation and create table:
 
-Test are split up by user story. You can run the tests for a given user story by running:
+Creation of tables with required fields.
+Assigning a table to an existing reservation based on availability and capacity requirements.
 
-`npm run test:X` where `X` is the user story number.
 
-Have a look at the following examples:
+![Screenshot PM](Screenshot%202024-01-13%20at%202.33.57%20PM.png)
 
-- `npm run test:1` runs all the tests for user story 1 (both frontend and backend).
-- `npm run test:3:backend` runs only the backend tests for user story 3.
-- `npm run test:3:frontend` runs only the frontend tests for user story 3.
 
-Whenever possible, frontend tests will run before backend tests to help you follow outside-in development.
+![Screenshot  PM](Screenshot%202024-01-13%20at%202.36.12%20PM.png)
 
-> **Note** When running `npm run test:X` If the frontend tests fail, the tests will stop before running the backend tests. Remember, you can always run `npm run test:X:backend` or `npm run test:X:frontend` to target a specific part of the application.
 
-Since tests take time to run, you might want to consider running only the tests for the user story you're working on at any given time.
 
-Once you have all user stories complete, you can run all the tests using the following commands:
+Search
 
-- `npm test` runs _all_ tests.
-- `npm run test:backend` runs _all_ backend tests.
-- `npm run test:frontend` runs _all_ frontend tests.
-- `npm run test:e2e` runs only the end-to-end tests.
+Allows user to search reservations by phone number.
+Ability to edit, seat, or cancel based on search results.
 
-If you would like a reminder of which npm scripts are available, run `npm run` to see a list of available commands.
+![Screenshot PM](Screenshot%202024-01-13%20at%202.37.58%20PM.png)
 
-Note that the logging level for the backend is set to `warn` when running tests and `info` otherwise.
-
-> **Note**: After running `npm test`, `npm run test:X`, or `npm run test:e2e` you might see something like the following in the output: `[start:frontend] Assertion failed:`. This is not a failure, it is just the frontend project getting shutdown automatically.
-
-> **Note**: If you are getting a `unable to resolve dependency tree` error when running the frontend tests, run the following command: `npm install --force --prefix front-end`. This will allow you to run the frontend tests.
-
-> **Hint**: If you stop the tests before they finish, it can leave the test database in an unusual state causing the tests to fail unexpectedly the next time you run them. If this happens, delete all tables in the test database, including the `knex_*` tables, and try the tests again.
-
-### Frontend test timeout failure
-
-Running the frontend tests on a resource constrained computer may result in timeout failures.
-
-If you believe your implementation is correct, but needs a bit more time to finish, you can update the `testTimeout` value in `front-end/e2e/jest.config.js`. A value of 10000 or even 12000 will give each test a few more seconds to complete.
-
-#### Screenshots
-
-To help you better understand what might be happening during the end-to-end tests, screenshots are taken at various points in the test.
-
-The screenshots are saved in `front-end/.screenshots` and you can review them after running the end-to-end tests.
-
-You can use the screenshots to debug your code by rendering additional information on the screen.
-
-## Product Backlog
-
-The Product Manager has already created the user stories for _Periodic Tables_. Each of the user stories is listed below, and your Product Manager wants them to be implemented in the order in which they are listed. Another developer has already written the tests for each of the user stories so that you don't have to.
-
-Although the user stories do not say anything about deployment, you should consider deploying early and often. You may even decide to deploy before adding any features. We recommend that you use Render to deploy this project.
-
-### US-01 Create and list reservations
+Technology:
+React.js
+Postgre.SQL
+Bootstrap
+Knex
 
 As a restaurant manager<br/>
 I want to create a new reservation when a customer calls<br/>
