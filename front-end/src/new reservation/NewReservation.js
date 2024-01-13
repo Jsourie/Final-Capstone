@@ -50,24 +50,23 @@ function NewReservation() {
   
     createReservation(reservation)
       .then((response) => {
-        // Check if the response indicates success
-        if (response.status === "success") {
-          history.push(`/dashboard/?date=${reservation.reservation_date}`);
-        } else {
-          // If the response indicates an error, set the error state
+        if (response.errors) {
           setError({
-            messages: response.errors || ["Failed to create reservation"],
+            messages: response.errors[0] || ["Failed to create reservation"],
           });
+        } else {
+          history.push(`/dashboard/?date=${reservation.reservation_date}`);
         }
       })
       .catch((error) => {
-        // Handle network or unexpected errors
         setError({
           messages: ["An unexpected error occurred while creating the reservation"],
         });
-        console.error("Error in createReservation:", error); // Log the error to the console
+        console.error("Error in createReservation:", error);
       });
   };
+  
+  
   
   
   
