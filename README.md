@@ -82,7 +82,11 @@ Ability to edit, seat, or cancel based on search results.
 
 ![Screenshot PM](Screenshot%202024-01-13%20at%202.37.58%20PM.png)
 
-
+Technology:
+React.js
+Postgre.SQL
+Bootstrap
+Knex
 
 
 
