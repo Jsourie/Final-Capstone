@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { listReservations, listTables } from "../utils/api";
 import ListTables from "./ListTables";
-import ErrorAlert from "../layout/ErrorAlert";
+import ErrorAlert from "../new reservation/ErrorAlert";
 import ListReservation from "../new reservation/ListReservation";
 import './Dashboard.css';
 
