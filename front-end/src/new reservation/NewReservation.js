@@ -45,7 +45,7 @@ function NewReservation() {
       console.log(selectedDateTime)
     }
 
-    if (selectedDateTime < today) {
+    if (selectedDateTime <= today) {
       errorMessages.push("Reservation date must be in the future.");
     }
 
